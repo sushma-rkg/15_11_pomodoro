@@ -7,7 +7,33 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Pomodoro Art</h1>
+  <main class="screen">
+    <div class="card art">
+      <div class="frame" id="frame">
+        <img class="art-img" id="artImg" alt="Artwork">
+        <canvas class="art-blur" id="artBlur" aria-hidden="true"></canvas>
+      </div>
+    </div>
+    <div class="card panel">
+      <div class="ring" id="ring">
+        <div class="ring-in">
+          <div class="time" id="time">00:30</div>
+          <p class="label" id="label">Ready to focus</p>
+        </div>
+      </div>
+      <div class="buttons">
+        <button type="button" class="btn primary" id="startPause">Start</button>
+        <button type="button" class="btn secondary" id="reset">Reset</button>
+        <button type="button" class="btn primary" id="restart" hidden>Restart session</button>
+      </div>
+      <div class="details" id="details" hidden>
+        <p class="name" id="paintingName"></p>
+        <p id="paintingArtist"></p>
+        <p id="paintingYear"></p>
+        <p><a id="paintingLink" target="_blank" rel="noopener noreferrer">Read about this painting on the Met website</a></p>
+      </div>
+    </div>
+  </main>
   <script src="script.js"></script>
 </body>
 </html>
