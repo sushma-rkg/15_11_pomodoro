@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup: Soft Studio</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Helvetica Neue",Arial,sans-serif;background:#dedad3;color:#3d3a36;padding:24px 16px 48px}
+.sheet-head{max-width:1100px;margin:0 auto 28px}
+.sheet-head h1{font-size:22px;font-weight:600}
+.sheet-head p{margin-top:6px;font-size:14px;color:#6b665f}
+h2.group{max-width:1100px;margin:36px auto 12px;font-size:16px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:#6b665f}
+.stage{max-width:1100px;margin:0 auto;overflow-x:auto;padding:12px}
+.row{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}
+figure{flex:none}
+figcaption{font-size:14px;font-weight:600;margin-bottom:16px;color:#4a4640}
+.screen{overflow:hidden}
+.screen.laptop{width:960px;min-height:520px;border-radius:12px;box-shadow:0 0 0 1px rgba(0,0,0,.12)}
+.screen.phone{width:360px;border-radius:30px;box-shadow:0 0 0 8px #2b2926}
+.art{overflow:hidden;position:relative}
+.art-img{position:absolute;inset:-40px;background:radial-gradient(circle at 28% 30%,#fbe38a 0 11%,transparent 11.5%),radial-gradient(circle at 72% 62%,#1f3a4d 0 16%,transparent 16.5%),repeating-linear-gradient(115deg,transparent 0 38px,rgba(255,255,255,.35) 38px 46px),linear-gradient(135deg,#e9b44c 0%,#c8553d 45%,#6d4c7d 75%,#2f4858 100%);filter:blur(var(--blur))}
+.art.sharp .art-img,.art-img.sharp{inset:0}
+.time{font-variant-numeric:tabular-nums}
+.btn{font:inherit;border:0;cursor:default}
+.details{text-align:left}
+.details .name{font-weight:600}
+.details a{color:inherit}
+
+.screen{background:#e9e6e1}
+.card{background:#fffefc;border-radius:28px;box-shadow:0 8px 28px rgba(60,55,45,.10)}
+.laptop{display:flex;gap:32px;padding:48px;align-items:stretch}
+.laptop .art{flex:1.1;min-height:420px}
+.laptop .panel{flex:1;padding:40px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.phone{padding:28px 20px 32px;display:flex;flex-direction:column;gap:20px}
+.phone .art{aspect-ratio:1/1}
+.phone .panel{padding:28px 20px;display:flex;flex-direction:column;align-items:center}
+.ring{--size:230px;width:var(--size);height:var(--size);border-radius:50%;background:conic-gradient(#8fa58a calc(var(--p)*1%),#e6e9e3 0);display:grid;place-items:center}
+.phone .ring{--size:200px}
+.ring-in{width:calc(100% - 22px);height:calc(100% - 22px);border-radius:50%;background:#fffefc;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.time{font-size:52px;font-weight:300;color:#3f4a3d}
+.label{font-size:13px;color:#7d8a79;margin-top:4px}
+.buttons{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap;justify-content:center}
+.btn{padding:14px 28px;border-radius:999px;font-size:16px}
+.btn.primary{background:#8fa58a;color:#fff}
+.btn.secondary{background:#e3eadf;color:#4d5c49}
+.details{margin-top:28px;font-size:15px;line-height:1.6;text-align:center;color:#4d5c49}
+.details .name{font-size:19px;color:#3f4a3d}
+</style>
+</head>
+<body>
+<div class="sheet-head"><h1>Mockup: Soft Studio</h1><p>Two soft cards side by side, a progress ring and sage-green buttons. Design only: nothing works yet, and the painting is a coloured placeholder.</p></div>
+<h2 class="group">Laptop-sized screen</h2><div class="stage"><div class="row"><figure><figcaption>1. Before starting</figcaption><section class="screen laptop"><div class="card art"><div class="art-img" style="--blur:26px"></div></div><div class="card panel"><div class="ring" style="--p:0"><div class="ring-in"><div class="time">25:00</div><p class="label">Ready to focus</p></div></div><div class="buttons"><button type="button" class="btn primary">Start</button><button type="button" class="btn secondary">Reset</button></div></div></section></figure><figure><figcaption>2. Timer running</figcaption><section class="screen laptop"><div class="card art"><div class="art-img" style="--blur:10px"></div></div><div class="card panel"><div class="ring" style="--p:42"><div class="ring-in"><div class="time">14:32</div><p class="label">Focusing</p></div></div><div class="buttons"><button type="button" class="btn primary">Pause</button><button type="button" class="btn secondary">Reset</button></div></div></section></figure><figure><figcaption>3. Timer finished</figcaption><section class="screen laptop"><div class="card art"><div class="art-img" style="--blur:0px;inset:0"></div></div><div class="card panel"><div class="ring" style="--p:100"><div class="ring-in"><div class="time">00:00</div><p class="label">Session complete</p></div></div><div class="buttons"><button type="button" class="btn primary">Restart session</button></div><div class="details"><p class="name">Painting name</p><p>Artist name</p><p>Year</p><p><a href="#">Read about this painting on the Met website</a></p></div></div></section></figure></div></div><h2 class="group">Phone-sized screen</h2><div class="stage"><div class="row"><figure><figcaption>1. Before starting</figcaption><section class="screen phone"><div class="card art"><div class="art-img" style="--blur:26px"></div></div><div class="card panel"><div class="ring" style="--p:0"><div class="ring-in"><div class="time">25:00</div><p class="label">Ready to focus</p></div></div><div class="buttons"><button type="button" class="btn primary">Start</button><button type="button" class="btn secondary">Reset</button></div></div></section></figure><figure><figcaption>2. Timer running</figcaption><section class="screen phone"><div class="card art"><div class="art-img" style="--blur:10px"></div></div><div class="card panel"><div class="ring" style="--p:42"><div class="ring-in"><div class="time">14:32</div><p class="label">Focusing</p></div></div><div class="buttons"><button type="button" class="btn primary">Pause</button><button type="button" class="btn secondary">Reset</button></div></div></section></figure><figure><figcaption>3. Timer finished</figcaption><section class="screen phone"><div class="card art"><div class="art-img" style="--blur:0px;inset:0"></div></div><div class="card panel"><div class="ring" style="--p:100"><div class="ring-in"><div class="time">00:00</div><p class="label">Session complete</p></div></div><div class="buttons"><button type="button" class="btn primary">Restart session</button></div><div class="details"><p class="name">Painting name</p><p>Artist name</p><p>Year</p><p><a href="#">Read about this painting on the Met website</a></p></div></div></section></figure></div></div>
+</body>
+</html>
