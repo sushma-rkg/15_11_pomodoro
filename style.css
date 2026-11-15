@@ -40,7 +40,8 @@ body {
 .art-img {
   position: absolute;
   inset: -40px;
-  filter: blur(26px);
+  filter: blur(var(--blur, 26px));
+  transition: filter 0.3s linear;
   background:
     radial-gradient(circle at 28% 30%, #fbe38a 0 11%, transparent 11.5%),
     radial-gradient(circle at 72% 62%, #1f3a4d 0 16%, transparent 16.5%),
