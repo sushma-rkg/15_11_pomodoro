@@ -1,7 +1,145 @@
-body {
+* {
+  box-sizing: border-box;
   margin: 0;
-  height: 100vh;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  background: #e9e6e1;
+  color: #3d3a36;
+}
+
+/* Phone: painting on top, timer below */
+.screen {
+  width: 100%;
+  max-width: 480px;
+  padding: 28px 20px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.card {
+  background: #fffefc;
+  border-radius: 28px;
+  box-shadow: 0 8px 28px rgba(60, 55, 45, 0.1);
+}
+
+.art {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 1 / 1;
+}
+
+/* Placeholder painting: blurred coloured shapes */
+.art-img {
+  position: absolute;
+  inset: -40px;
+  filter: blur(26px);
+  background:
+    radial-gradient(circle at 28% 30%, #fbe38a 0 11%, transparent 11.5%),
+    radial-gradient(circle at 72% 62%, #1f3a4d 0 16%, transparent 16.5%),
+    repeating-linear-gradient(115deg, transparent 0 38px, rgba(255, 255, 255, 0.35) 38px 46px),
+    linear-gradient(135deg, #e9b44c 0%, #c8553d 45%, #6d4c7d 75%, #2f4858 100%);
+}
+
+.panel {
+  padding: 28px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ring {
+  --size: 200px;
+  --p: 0;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background: conic-gradient(#8fa58a calc(var(--p) * 1%), #e6e9e3 0);
+  display: grid;
+  place-items: center;
+}
+
+.ring-in {
+  width: calc(100% - 22px);
+  height: calc(100% - 22px);
+  border-radius: 50%;
+  background: #fffefc;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.time {
+  font-size: 52px;
+  font-weight: 300;
+  color: #3f4a3d;
+  font-variant-numeric: tabular-nums;
+}
+
+.label {
+  font-size: 13px;
+  color: #7d8a79;
+  margin-top: 4px;
+}
+
+.buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 28px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btn {
+  font: inherit;
+  font-size: 16px;
+  border: 0;
+  padding: 14px 28px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.btn.primary {
+  background: #8fa58a;
+  color: #fff;
+}
+
+.btn.secondary {
+  background: #e3eadf;
+  color: #4d5c49;
+}
+
+/* Laptop: painting and timer side by side */
+@media (min-width: 700px) {
+  .screen {
+    max-width: 960px;
+    padding: 48px;
+    flex-direction: row;
+    gap: 32px;
+    align-items: stretch;
+  }
+
+  .art {
+    flex: 1.1;
+    aspect-ratio: auto;
+    min-height: 420px;
+  }
+
+  .panel {
+    flex: 1;
+    padding: 40px;
+    justify-content: center;
+  }
+
+  .ring {
+    --size: 230px;
+  }
 }
