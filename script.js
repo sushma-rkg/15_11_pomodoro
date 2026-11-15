@@ -1,6 +1,6 @@
-// Pomodoro timer: always 25 minutes.
-const TOTAL_MS = 25 * 60 * 1000;
-const START_BLUR = 26; // pixels of blur at 25:00, 0 at 00:00
+// Pomodoro timer: 30 seconds for testing (normal length is 25 minutes).
+const TOTAL_MS = 30 * 1000;
+const START_BLUR = 26; // pixels of blur at the start, 0 at 00:00
 
 const timeEl = document.getElementById("time");
 const labelEl = document.getElementById("label");
