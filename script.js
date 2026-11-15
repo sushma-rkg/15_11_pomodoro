@@ -1,10 +1,14 @@
 // Pomodoro timer: 30 seconds for testing (normal length is 25 minutes).
 const TOTAL_MS = 30 * 1000;
+const START_BLUR = 26; // pixels of blur at the start (0 at 00:00)
+const BLUR_PAD = 80; // must match --pad in style.css
 
 const timeEl = document.getElementById("time");
 const labelEl = document.getElementById("label");
 const ringEl = document.getElementById("ring");
+const frameEl = document.getElementById("frame");
 const artEl = document.getElementById("artImg");
+const blurCanvas = document.getElementById("artBlur");
 const nameEl = document.getElementById("paintingName");
 const artistEl = document.getElementById("paintingArtist");
 const yearEl = document.getElementById("paintingYear");
@@ -141,7 +145,7 @@ function showPainting(record) {
 }
 
 function clearPainting() {
-  artEl.classList.remove("loaded");
+  frameEl.classList.remove("loaded");
   artEl.removeAttribute("src");
   nameEl.textContent = "";
   artistEl.textContent = "";
@@ -156,7 +160,41 @@ async function loadPainting() {
   if (record && myLoad === loadCounter) showPainting(record);
 }
 
-artEl.addEventListener("load", () => artEl.classList.add("loaded"));
+// Draw the blurred copy: the painting plus mirrored copies of itself around
+// every edge, so the blur has real picture to mix in at the edges (no fading
+// to transparent, and nothing cut off).
+function drawBlurCopy() {
+  const w = frameEl.clientWidth;
+  const h = frameEl.clientHeight;
+  if (!artEl.complete || !artEl.naturalWidth || !w || !h) return;
+  const dpr = Math.max(window.devicePixelRatio || 1, 2);
+  blurCanvas.width = Math.round((w + 2 * BLUR_PAD) * dpr);
+  blurCanvas.height = Math.round((h + 2 * BLUR_PAD) * dpr);
+  const ctx = blurCanvas.getContext("2d");
+  for (let ix = -1; ix <= 1; ix++) {
+    for (let iy = -1; iy <= 1; iy++) {
+      const x0 = BLUR_PAD + ix * w;
+      const y0 = BLUR_PAD + iy * h;
+      const sx = ix === 0 ? 1 : -1;
+      const sy = iy === 0 ? 1 : -1;
+      ctx.setTransform(dpr * sx, 0, 0, dpr * sy,
+        dpr * (sx === 1 ? x0 : x0 + w), dpr * (sy === 1 ? y0 : y0 + h));
+      ctx.drawImage(artEl, 0, 0, w, h);
+    }
+  }
+}
+
+// Only show the painting once it is loaded AND its blurred copy is ready.
+artEl.addEventListener("load", () => {
+  frameEl.style.setProperty("--ar", artEl.naturalWidth / artEl.naturalHeight);
+  drawBlurCopy();
+  frameEl.classList.add("loaded");
+});
+
+// If the screen size changes (turning a phone, resizing), redraw the copy.
+new ResizeObserver(() => {
+  if (frameEl.classList.contains("loaded")) drawBlurCopy();
+}).observe(frameEl);
 
 function show(ms) {
   const seconds = Math.ceil(ms / 1000);
@@ -166,6 +204,8 @@ function show(ms) {
 
   const done = 1 - ms / TOTAL_MS; // 0 at start, 1 at the end
   ringEl.style.setProperty("--p", (done * 100).toFixed(2));
+  frameEl.style.setProperty("--blur", (START_BLUR * (1 - done)).toFixed(2) + "px");
+  frameEl.classList.toggle("sharp", ms === 0);
 }
 
 function tick() {
@@ -247,4 +287,5 @@ document.addEventListener("visibilitychange", () => {
   if (state === "running") tick();
 });
 
+show(remainingMs); // starts strongly blurred
 loadPainting(); // first painting when the page opens

@@ -36,23 +36,52 @@ body {
   aspect-ratio: 1 / 1;
 }
 
-/* The real painting: always shown whole (never stretched or cut off) */
+/* The real painting: always shown whole (never stretched or cut off).
+   The "frame" is exactly the painting's shape, so the blur is trimmed to
+   crisp edges and never spills outside it. */
 .art {
   background: #f1eeea;
+  container-type: size; /* lets the frame measure the card */
+  display: grid;
+  place-items: center;
+  overflow: hidden;
 }
 
-.art-img {
-  position: absolute;
-  inset: 16px;
-  width: calc(100% - 32px);
-  height: calc(100% - 32px);
-  object-fit: contain;
+.frame {
+  --blur: 26px; /* strongly blurred until the script says otherwise */
+  --pad: 80px; /* extra mirrored edge around the blurred copy */
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: var(--ar, 1);
+  width: min(calc(100cqw - 32px), calc((100cqh - 32px) * var(--ar, 1)));
   opacity: 0;
   transition: opacity 0.3s ease;
 }
 
-.art-img.loaded {
+.frame.loaded {
   opacity: 1;
+}
+
+.art-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* A blurred copy drawn on top; it is hidden once the painting is sharp. */
+.art-blur {
+  position: absolute;
+  left: calc(var(--pad) * -1);
+  top: calc(var(--pad) * -1);
+  width: calc(100% + var(--pad) * 2);
+  height: calc(100% + var(--pad) * 2);
+  filter: blur(var(--blur));
+  transition: filter 0.3s linear;
+}
+
+.frame.sharp .art-blur {
+  display: none;
 }
 
 .panel {
