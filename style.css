@@ -144,3 +144,26 @@ body {
     --size: 230px;
   }
 }
+
+/* Finished state: painting details (placeholder text for now) */
+[hidden] {
+  display: none !important;
+}
+
+.details {
+  margin-top: 28px;
+  font-size: 15px;
+  line-height: 1.6;
+  text-align: center;
+  color: #4d5c49;
+}
+
+.details .name {
+  font-size: 19px;
+  font-weight: 600;
+  color: #3f4a3d;
+}
+
+.details a {
+  color: inherit;
+}

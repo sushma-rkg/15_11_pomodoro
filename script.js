@@ -8,8 +8,10 @@ const ringEl = document.getElementById("ring");
 const artEl = document.getElementById("artImg");
 const startPauseBtn = document.getElementById("startPause");
 const resetBtn = document.getElementById("reset");
+const restartBtn = document.getElementById("restart");
+const detailsEl = document.getElementById("details");
 
-// state: "idle" (before starting), "running", "paused"
+// state: "idle" (before starting), "running", "paused", "finished"
 let state = "idle";
 let remainingMs = TOTAL_MS; // time left while idle or paused
 let endTime = 0; // real clock time when the timer ends (while running)
@@ -31,10 +33,21 @@ function tick() {
   // even if the browser slows this page down in a background tab.
   remainingMs = Math.max(0, endTime - Date.now());
   show(remainingMs);
-  if (remainingMs === 0) {
-    clearInterval(intervalId);
-    intervalId = null;
-  }
+  if (remainingMs === 0) finish();
+}
+
+// Time is up: stop at 00:00, swap the buttons, show the painting details.
+function finish() {
+  clearInterval(intervalId);
+  intervalId = null;
+  remainingMs = 0;
+  state = "finished";
+  show(0);
+  labelEl.textContent = "Session complete";
+  startPauseBtn.hidden = true;
+  resetBtn.hidden = true;
+  restartBtn.hidden = false;
+  detailsEl.hidden = false;
 }
 
 function startCounting() {
@@ -49,6 +62,10 @@ startPauseBtn.addEventListener("click", () => {
     clearInterval(intervalId);
     intervalId = null;
     remainingMs = Math.max(0, endTime - Date.now());
+    if (remainingMs === 0) {
+      finish();
+      return;
+    }
     show(remainingMs);
     state = "paused";
     startPauseBtn.textContent = "Resume";
@@ -61,15 +78,23 @@ startPauseBtn.addEventListener("click", () => {
   }
 });
 
-resetBtn.addEventListener("click", () => {
+// Back to the "Before starting" look (used by Reset and Restart session).
+function resetToStart() {
   clearInterval(intervalId);
   intervalId = null;
   state = "idle";
   remainingMs = TOTAL_MS;
   labelEl.textContent = "Ready to focus";
   startPauseBtn.textContent = "Start";
+  startPauseBtn.hidden = false;
+  resetBtn.hidden = false;
+  restartBtn.hidden = true;
+  detailsEl.hidden = true;
   show(remainingMs);
-});
+}
+
+resetBtn.addEventListener("click", resetToStart);
+restartBtn.addEventListener("click", resetToStart);
 
 // When you come back to the tab, update straight away.
 document.addEventListener("visibilitychange", () => {
