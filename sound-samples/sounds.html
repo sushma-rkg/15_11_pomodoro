@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bell sound samples</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 24px 16px;
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      background: #e9e6e1;
+      color: #3d3a36;
+    }
+    h1 { font-size: 22px; font-weight: 600; }
+    p { font-size: 15px; color: #6b665f; margin-bottom: 8px; text-align: center; }
+    button {
+      font: inherit;
+      font-size: 16px;
+      width: 260px;
+      padding: 14px 28px;
+      border: 0;
+      border-radius: 999px;
+      background: #8fa58a;
+      color: #fff;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Bell sound samples</h1>
+  <p>Press a button to hear a sound. Turn your volume up a little.</p>
+  <button type="button" data-sound="softChime">1. Soft chime</button>
+  <button type="button" data-sound="templeBell">2. Temple bell</button>
+  <button type="button" data-sound="deskBell">3. Desk bell</button>
+
+  <script>
+    // One ringing "note": several pure tones (partials) that fade out.
+    // partials = [frequency ratio, loudness, how long it rings in seconds]
+    function ring(ctx, out, when, freq, partials) {
+      partials.forEach(([ratio, level, decay]) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.value = freq * ratio;
+        gain.gain.setValueAtTime(0.0001, when);
+        gain.gain.exponentialRampToValueAtTime(level, when + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.0001, when + decay);
+        osc.connect(gain);
+        gain.connect(out);
+        osc.start(when);
+        osc.stop(when + decay + 0.05);
+      });
+    }
+
+    // 1. Soft chime: high, gentle, glass-like, about 2.5 seconds
+    function softChime(ctx, out, when) {
+      ring(ctx, out, when, 1046.5, [[1, 0.30, 4.2], [2.76, 0.12, 2.6], [5.4, 0.05, 1.4]]);
+    }
+
+    // 2. Temple bell: deep, round, long warm fade, about 3 seconds
+    function templeBell(ctx, out, when) {
+      ring(ctx, out, when, 220, [[0.5, 0.20, 4.2], [1, 0.30, 4.2], [1.19, 0.14, 3.4],
+                                 [1.5, 0.10, 2.8], [2, 0.12, 2.5], [2.74, 0.06, 1.7]]);
+    }
+
+    // 3. Desk bell: bright, quick "ding-ding", about 2.5 seconds
+    function deskBell(ctx, out, when) {
+      const partials = [[1, 0.26, 2.6], [2.4, 0.12, 1.6], [4.1, 0.06, 1.0]];
+      ring(ctx, out, when, 1760, partials);
+      ring(ctx, out, when + 0.6, 1760, partials);
+    }
+
+    const sounds = { softChime, templeBell, deskBell };
+    let audioCtx = null;
+
+    document.querySelectorAll("button[data-sound]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        sounds[btn.dataset.sound](audioCtx, audioCtx.destination, audioCtx.currentTime + 0.05);
+      });
+    });
+  </script>
+</body>
+</html>

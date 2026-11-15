@@ -17,6 +17,68 @@ let remainingMs = TOTAL_MS; // time left while idle or paused
 let endTime = 0; // real clock time when the timer ends (while running)
 let intervalId = null;
 
+// ---- Temple bell (made with the browser's built-in Web Audio, no sound files) ----
+let audioCtx = null;
+let activeBell = null; // the bell that is scheduled or ringing right now
+
+function getAudio() {
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === "suspended") audioCtx.resume();
+    return audioCtx;
+  } catch (e) {
+    return null; // no sound available: the timer still works
+  }
+}
+
+// partials = [frequency ratio, loudness, seconds it keeps ringing]
+function templeBell(ctx, out, when, oscillators) {
+  const freq = 220;
+  const partials = [[0.5, 0.20, 4.2], [1, 0.30, 4.2], [1.19, 0.14, 3.4],
+                    [1.5, 0.10, 2.8], [2, 0.12, 2.5], [2.74, 0.06, 1.7]];
+  partials.forEach(([ratio, level, decay]) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.value = freq * ratio;
+    gain.gain.setValueAtTime(0.0001, when);
+    gain.gain.exponentialRampToValueAtTime(level, when + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, when + decay);
+    osc.connect(gain);
+    gain.connect(out);
+    osc.start(when);
+    osc.stop(when + decay + 0.05);
+    oscillators.push(osc);
+  });
+}
+
+// Book the bell for the exact moment the timer ends. The audio clock keeps
+// perfect time even when the browser slows this page down in a background tab.
+function scheduleBell(delayMs) {
+  cancelBell();
+  const ctx = getAudio();
+  if (!ctx) return;
+  const bus = ctx.createGain();
+  bus.connect(ctx.destination);
+  const oscillators = [];
+  templeBell(ctx, bus, ctx.currentTime + delayMs / 1000, oscillators);
+  activeBell = { bus, oscillators };
+}
+
+// Cancel a booked bell, or quickly fade out one that is already ringing.
+function cancelBell() {
+  if (!activeBell) return;
+  const now = audioCtx.currentTime;
+  const { bus, oscillators } = activeBell;
+  bus.gain.cancelScheduledValues(now);
+  bus.gain.setValueAtTime(bus.gain.value, now);
+  bus.gain.linearRampToValueAtTime(0, now + 0.05);
+  oscillators.forEach((osc) => {
+    try { osc.stop(now + 0.1); } catch (e) { /* already stopped */ }
+  });
+  activeBell = null;
+}
+
 function show(ms) {
   const seconds = Math.ceil(ms / 1000);
   const mm = String(Math.floor(seconds / 60)).padStart(2, "0");
@@ -54,6 +116,7 @@ function startCounting() {
   endTime = Date.now() + remainingMs;
   clearInterval(intervalId);
   intervalId = setInterval(tick, 250);
+  scheduleBell(remainingMs);
   tick();
 }
 
@@ -63,9 +126,10 @@ startPauseBtn.addEventListener("click", () => {
     intervalId = null;
     remainingMs = Math.max(0, endTime - Date.now());
     if (remainingMs === 0) {
-      finish();
+      finish(); // time was already up: let the bell ring
       return;
     }
+    cancelBell();
     show(remainingMs);
     state = "paused";
     startPauseBtn.textContent = "Resume";
@@ -82,6 +146,7 @@ startPauseBtn.addEventListener("click", () => {
 function resetToStart() {
   clearInterval(intervalId);
   intervalId = null;
+  cancelBell(); // stops a booked bell, or one that is still ringing
   state = "idle";
   remainingMs = TOTAL_MS;
   labelEl.textContent = "Ready to focus";
