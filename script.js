@@ -1,11 +1,14 @@
 // Pomodoro timer: 30 seconds for testing (normal length is 25 minutes).
 const TOTAL_MS = 30 * 1000;
-const START_BLUR = 26; // pixels of blur at the start, 0 at 00:00
 
 const timeEl = document.getElementById("time");
 const labelEl = document.getElementById("label");
 const ringEl = document.getElementById("ring");
 const artEl = document.getElementById("artImg");
+const nameEl = document.getElementById("paintingName");
+const artistEl = document.getElementById("paintingArtist");
+const yearEl = document.getElementById("paintingYear");
+const linkEl = document.getElementById("paintingLink");
 const startPauseBtn = document.getElementById("startPause");
 const resetBtn = document.getElementById("reset");
 const restartBtn = document.getElementById("restart");
@@ -79,6 +82,82 @@ function cancelBell() {
   activeBell = null;
 }
 
+// ---- The painting (from the Met Museum's free public API) ----
+const MET_API = "https://collectionapi.metmuseum.org/public/collection/v1";
+let loadCounter = 0; // so an older, slower request can never replace a newer painting
+
+// The Met's search only lets us reach the first 10,000 results, 500 at a time.
+// So we ask for one random page of 500 ID numbers and pick from it.
+async function getRandomPageOfIds() {
+  const offset = Math.floor(Math.random() * 20) * 500; // 0, 500, ... 9500
+  const url = MET_API.replace("/v1", "/v1.1") +
+    "/search?hasImages=true&medium=Paintings&q=*&limit=500&offset=" + offset;
+  const res = await fetch(url);
+  return (await res.json()).objectIDs || [];
+}
+
+// Only real paintings that are public domain and have an image.
+// (The Met's search also returns boxes, scrolls, fans, drawings and so on,
+// so we check the record's own object type too.)
+function qualifies(record) {
+  return Boolean(
+    record &&
+    record.objectName === "Painting" &&
+    record.isPublicDomain === true &&
+    (record.primaryImageSmall || record.primaryImage)
+  );
+}
+
+async function getRecord(id) {
+  try {
+    const res = await fetch(MET_API + "/objects/" + id);
+    return res.ok ? await res.json() : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+// Look at a few random paintings at once and keep one that qualifies.
+// If none do, quietly try a fresh random page of results.
+async function pickRandomPainting() {
+  for (let round = 0; round < 6; round++) {
+    const ids = await getRandomPageOfIds();
+    if (ids.length === 0) continue;
+    const candidates = Array.from({ length: 12 }, () => ids[Math.floor(Math.random() * ids.length)]);
+    const records = await Promise.all(candidates.map(getRecord));
+    const good = records.filter(qualifies);
+    if (good.length > 0) return good[Math.floor(Math.random() * good.length)];
+  }
+  return null;
+}
+
+// Show one painting. The image and the details come from the same record.
+function showPainting(record) {
+  artEl.src = record.primaryImageSmall || record.primaryImage;
+  nameEl.textContent = record.title || "Unknown";
+  artistEl.textContent = record.artistDisplayName || "Unknown";
+  yearEl.textContent = record.objectDate || "Unknown";
+  linkEl.href = record.objectURL;
+}
+
+function clearPainting() {
+  artEl.classList.remove("loaded");
+  artEl.removeAttribute("src");
+  nameEl.textContent = "";
+  artistEl.textContent = "";
+  yearEl.textContent = "";
+  linkEl.removeAttribute("href");
+}
+
+async function loadPainting() {
+  const myLoad = ++loadCounter;
+  clearPainting();
+  const record = await pickRandomPainting();
+  if (record && myLoad === loadCounter) showPainting(record);
+}
+
+artEl.addEventListener("load", () => artEl.classList.add("loaded"));
+
 function show(ms) {
   const seconds = Math.ceil(ms / 1000);
   const mm = String(Math.floor(seconds / 60)).padStart(2, "0");
@@ -87,7 +166,6 @@ function show(ms) {
 
   const done = 1 - ms / TOTAL_MS; // 0 at start, 1 at the end
   ringEl.style.setProperty("--p", (done * 100).toFixed(2));
-  artEl.style.setProperty("--blur", (START_BLUR * (1 - done)).toFixed(2) + "px");
 }
 
 function tick() {
@@ -159,9 +237,14 @@ function resetToStart() {
 }
 
 resetBtn.addEventListener("click", resetToStart);
-restartBtn.addEventListener("click", resetToStart);
+restartBtn.addEventListener("click", () => {
+  resetToStart();
+  loadPainting(); // Restart session = a new painting
+});
 
 // When you come back to the tab, update straight away.
 document.addEventListener("visibilitychange", () => {
   if (state === "running") tick();
 });
+
+loadPainting(); // first painting when the page opens

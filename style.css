@@ -36,17 +36,23 @@ body {
   aspect-ratio: 1 / 1;
 }
 
-/* Placeholder painting: blurred coloured shapes */
+/* The real painting: always shown whole (never stretched or cut off) */
+.art {
+  background: #f1eeea;
+}
+
 .art-img {
   position: absolute;
-  inset: -40px;
-  filter: blur(var(--blur, 26px));
-  transition: filter 0.3s linear;
-  background:
-    radial-gradient(circle at 28% 30%, #fbe38a 0 11%, transparent 11.5%),
-    radial-gradient(circle at 72% 62%, #1f3a4d 0 16%, transparent 16.5%),
-    repeating-linear-gradient(115deg, transparent 0 38px, rgba(255, 255, 255, 0.35) 38px 46px),
-    linear-gradient(135deg, #e9b44c 0%, #c8553d 45%, #6d4c7d 75%, #2f4858 100%);
+  inset: 16px;
+  width: calc(100% - 32px);
+  height: calc(100% - 32px);
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.art-img.loaded {
+  opacity: 1;
 }
 
 .panel {
@@ -145,7 +151,7 @@ body {
   }
 }
 
-/* Finished state: painting details (placeholder text for now) */
+/* Finished state: painting details */
 [hidden] {
   display: none !important;
 }
@@ -156,6 +162,10 @@ body {
   line-height: 1.6;
   text-align: center;
   color: #4d5c49;
+}
+
+.details p {
+  overflow-wrap: anywhere;
 }
 
 .details .name {

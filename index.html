@@ -8,8 +8,8 @@
 </head>
 <body>
   <main class="screen">
-    <div class="card art" role="img" aria-label="Blurred artwork placeholder">
-      <div class="art-img" id="artImg"></div>
+    <div class="card art">
+      <img class="art-img" id="artImg" alt="Artwork">
     </div>
     <div class="card panel">
       <div class="ring" id="ring">
@@ -24,10 +24,10 @@
         <button type="button" class="btn primary" id="restart" hidden>Restart session</button>
       </div>
       <div class="details" id="details" hidden>
-        <p class="name">Painting name</p>
-        <p>Artist name</p>
-        <p>Year</p>
-        <p><a href="https://example.com/painting-placeholder" target="_blank" rel="noopener noreferrer">Read about this painting on the Met website</a></p>
+        <p class="name" id="paintingName"></p>
+        <p id="paintingArtist"></p>
+        <p id="paintingYear"></p>
+        <p><a id="paintingLink" target="_blank" rel="noopener noreferrer">Read about this painting on the Met website</a></p>
       </div>
     </div>
   </main>
